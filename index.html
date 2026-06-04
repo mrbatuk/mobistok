@@ -80,9 +80,22 @@
   .shot .bar i:nth-child(1){background:#ef5350}
   .shot .bar i:nth-child(2){background:#ffb74d}
   .shot .bar i:nth-child(3){background:#66bb6a}
-  .shot img{width:100%;display:block}
+  .shot img{width:100%;display:block;cursor:zoom-in;transition:opacity .15s ease}
+  .shot img:hover{opacity:.92}
   .shot .cap{padding:14px 16px;color:var(--muted);font-size:.95rem;border-top:1px solid var(--line)}
   .shot .cap b{color:var(--ink)}
+
+  /* Lightbox (görsel büyütme) */
+  #lightbox{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.88);
+    display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;
+    animation:fadeIn .15s ease}
+  #lightbox.show{display:flex}
+  #lightbox img{max-width:100%;max-height:92vh;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+  #lightboxClose{position:absolute;top:18px;right:22px;width:42px;height:42px;border-radius:50%;
+    background:rgba(255,255,255,.18);color:#fff;border:0;font-size:1.4rem;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:background .15s ease}
+  #lightboxClose:hover{background:rgba(255,255,255,.32)}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
   /* KARSILASTIRMA */
   .cmp{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
@@ -126,6 +139,76 @@
   footer{background:#0d1b2a;color:#cfd8dc;padding:30px 20px;text-align:center;font-size:.92rem}
   footer a{color:#90caf9}
   footer .brand{justify-content:center;color:#fff;margin-bottom:10px;font-size:1.1rem}
+
+  /* ================= MOBİL UYUMU ================= */
+  @media (max-width: 760px) {
+    /* Navbar: linkleri gizle, sadece logo + tıkla menü emoji */
+    .nav-links { display: none; }
+    .brand { font-size: 1.1rem; }
+    .brand .logo { width: 36px; height: 36px; font-size: 18px; }
+
+    /* Hero metin küçült */
+    header.hero { padding: 14px 0 50px; }
+    .hero-main { margin-top: 24px; }
+    .hero-main h1 { font-size: 1.9rem; line-height: 1.15; }
+    .hero-main p.lead { font-size: 1rem; margin-top: 14px }
+    .cta-group { margin-top: 24px; gap: 10px }
+    .cta-group .btn { padding: 11px 18px; font-size: .95rem }
+    .badges { margin-top: 24px; gap: 6px }
+    .badge { font-size: .78rem; padding: 5px 10px }
+
+    /* Section padding */
+    section { padding: 48px 0 }
+    .section-head { margin-bottom: 32px }
+    .section-head h2 { font-size: 1.65rem }
+    .section-head p { font-size: 1rem }
+
+    /* Özellik kategorisi başlığı */
+    .feat-cat { margin-bottom: 42px }
+    .feat-cat-title { gap: 10px }
+    .feat-cat-title .num { width: 36px; height: 36px; font-size: 1rem }
+    .feat-cat-title h3 { font-size: 1.15rem }
+    .feat-cat-title p { font-size: .88rem }
+
+    /* Karşılaştırma tablosu — mobilde kart düzeni (kaydırma yok) */
+    .cmp-wrap { overflow: visible !important }
+    .cmp {
+      border: 0 !important; background: transparent !important;
+      box-shadow: none !important; overflow: visible !important;
+      border-collapse: collapse !important; border-spacing: 0 !important;
+      border-radius: 0 !important; display: block;
+    }
+    .cmp thead { display: none !important }
+    .cmp tbody { display: block }
+    .cmp tbody tr {
+      display: block;
+      background: #fff; border: 1px solid var(--line); border-radius: 12px;
+      padding: 12px 14px; margin-bottom: 10px; overflow: hidden;
+    }
+    .cmp tbody td { display: block; padding: 4px 0; border: 0 !important; background: transparent !important }
+    .cmp tbody td:first-child {
+      font-weight: 700; color: var(--ink); font-size: 1rem;
+      padding-bottom: 8px; margin-bottom: 4px; border-bottom: 1px dashed var(--line) !important
+    }
+    .cmp tbody td.us { color: var(--green); font-weight: 600 }
+    .cmp tbody td.us::before {
+      content: "✓ MobiStok: "; color: var(--green); font-weight: 700;
+      font-size: .82rem; opacity: .85
+    }
+    .cmp tbody td.them { color: var(--muted) }
+    .cmp tbody td.them::before {
+      content: "✗ Online: "; color: #b71c1c; font-weight: 700;
+      font-size: .82rem; opacity: .85
+    }
+
+    /* Paket kartı */
+    .plan { padding: 26px 20px }
+    .plan .price { font-size: 2.1rem }
+
+    /* Final CTA */
+    .final { padding: 36px 22px }
+    .final h2 { font-size: 1.5rem }
+  }
 </style>
 </head>
 <body>
@@ -305,6 +388,7 @@
       <h2>Neden Lokal Çözüm?</h2>
       <p>Online aboneliklerin aksine MobiStok bilgisayarınızda çalışır. Farkı görün:</p>
     </div>
+    <div class="cmp-wrap">
     <table class="cmp">
       <thead>
         <tr><th>Konu</th><th class="col-us">MobiStok (Lokal)</th><th>Online Programlar</th></tr>
@@ -320,6 +404,7 @@
         <tr><td>Güncelleme</td><td class="us">Bilgi gelir, istersen yükle</td><td class="them">Zorunlu, kontrol sende değil</td></tr>
       </tbody>
     </table>
+    </div>
   </div>
 </section>
 
@@ -398,7 +483,35 @@
   </div>
 </section>
 
+<!-- Lightbox -->
+<div id="lightbox" aria-label="Görseli kapat">
+  <button id="lightboxClose" aria-label="Kapat">✕</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
 <script>
+  // Görsel büyütme (lightbox)
+  (function(){
+    var lb = document.getElementById('lightbox');
+    var img = document.getElementById('lightboxImg');
+    var close = function(){ lb.classList.remove('show'); document.body.style.overflow=''; };
+    document.querySelectorAll('.shot img').forEach(function(el){
+      el.addEventListener('click', function(){
+        img.src = this.src;
+        img.alt = this.alt || '';
+        lb.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    lb.addEventListener('click', function(e){
+      // Görsele tıklarsa kapatma; dışına tıklarsa kapat
+      if (e.target !== img) close();
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') close();
+    });
+  })();
+
   function gonderWhatsapp(e){
     e.preventDefault();
     var ad = document.getElementById('ad').value.trim();
