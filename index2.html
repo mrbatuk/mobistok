@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MobiStok — Telefon Dükkânı İçin Stok, Satış, Cari & Kâr Takip Programı</title>
+  <meta name="description" content="MobiStok; telefon dükkanları için alış, satış, stok, sayım, cari hesap, kasa raporu ve kâr takibini tek programda sunan aboneliksiz, internetsiz çalışan lokal yazılımdır." />
+  <meta name="theme-color" content="#0b1220" />
+  <meta property="og:title" content="MobiStok — Telefon Dükkânı İçin Eksiksiz Dijital Yönetim" />
+  <meta property="og:description" content="Alış, satış, stok, sayım, cari hesap, kasa raporu ve kâr takibi. Aboneliksiz, internetsiz, kolay kullanım." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="logo.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png" />
+  <link rel="apple-touch-icon" href="icon-256.png" />
+  <style>
+    :root{
+      --bg:#08111f;
+      --bg2:#0c1728;
+      --surface:#101c31;
+      --surface2:#13233b;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --white:#f8fafc;
+      --white-muted:#b7c3d8;
+      --line:rgba(148,163,184,.22);
+      --brand:#1e88e5;
+      --brand2:#0d47a1;
+      --accent:#2dd4bf;
+      --success:#16a34a;
+      --warning:#f59e0b;
+      --danger:#ef4444;
+      --shadow:0 24px 70px rgba(2,6,23,.18);
+      --radius:24px;
+      --radius2:16px;
+      --container:1180px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color:var(--text);
+      background:#f4f7fb;
+      line-height:1.55;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+    button,input,textarea{font:inherit}
+    .container{width:min(var(--container), calc(100% - 40px)); margin-inline:auto}
+    .skip-link{position:absolute;left:-999px;top:16px;z-index:1000;background:#fff;color:#000;padding:10px 14px;border-radius:10px}
+    .skip-link:focus{left:16px}
+
+    /* Header */
+    .site-header{
+      position:sticky;
+      top:0;
+      z-index:80;
+      backdrop-filter:saturate(160%) blur(16px);
+      background:rgba(8,17,31,.78);
+      border-bottom:1px solid rgba(148,163,184,.18);
+    }
+    .nav{
+      min-height:76px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+    .brand img{width:42px;height:42px;object-fit:contain;border-radius:12px}
+    .brand-text{display:flex;flex-direction:column;line-height:1.1}
+    .brand-text strong{font-size:18px;letter-spacing:.2px;color:#fff}
+    .brand-text span{font-size:12px;color:var(--white-muted)}
+    .nav-links{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      color:#dbeafe;
+      font-size:14px;
+      font-weight:650;
+    }
+    .nav-links a{padding:10px 12px;border-radius:999px;transition:.2s ease}
+    .nav-links a:hover{background:rgba(255,255,255,.09);color:#fff}
+    .nav-cta{display:flex;align-items:center;gap:10px}
+    .menu-btn{display:none;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:9px 12px;cursor:pointer}
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      min-height:46px;
+      padding:12px 18px;
+      border:0;
+      border-radius:999px;
+      font-weight:800;
+      letter-spacing:.1px;
+      cursor:pointer;
+      transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{color:#fff;background:linear-gradient(135deg,var(--brand2),var(--brand));box-shadow:0 14px 34px rgba(30,136,229,.26)}
+    .btn-primary:hover{box-shadow:0 18px 42px rgba(30,136,229,.34)}
+    .btn-light{background:#fff;color:#0f172a;box-shadow:0 12px 28px rgba(15,23,42,.14)}
+    .btn-soft{background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.16)}
+    .btn-whatsapp{background:#22c55e;color:#052e16;box-shadow:0 14px 34px rgba(34,197,94,.24)}
+
+    /* Hero */
+    .hero{
+      position:relative;
+      overflow:hidden;
+      color:#fff;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(45,212,191,.25), transparent 28%),
+        radial-gradient(circle at 82% 20%, rgba(30,136,229,.30), transparent 30%),
+        linear-gradient(135deg,#070d1a 0%,#0c1730 48%,#07111f 100%);
+      padding:76px 0 72px;
+    }
+    .hero:before{
+      content:"";
+      position:absolute;inset:0;
+      background-image:linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:linear-gradient(to bottom, rgba(0,0,0,.8), transparent 82%);
+      pointer-events:none;
+    }
+    .hero .container{position:relative;z-index:1}
+    .hero-grid{
+      display:grid;
+      grid-template-columns:minmax(0,1.02fr) minmax(420px,.98fr);
+      gap:48px;
+      align-items:center;
+    }
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:9px;
+      padding:8px 12px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      color:#dff8ff;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:750;
+      margin-bottom:20px;
+    }
+    .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 6px rgba(45,212,191,.14)}
+    h1{
+      margin:0;
+      font-size:clamp(42px, 6vw, 76px);
+      line-height:.95;
+      letter-spacing:-2.5px;
+    }
+    .hero-title span{display:block;background:linear-gradient(90deg,#fff,#cfe8ff 55%,#77e8dd);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero-lead{margin:24px 0 0;max-width:690px;color:#cbd5e1;font-size:clamp(17px,1.6vw,21px)}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+    .trust-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+    .trust-pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:9px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      color:#e2e8f0;
+      font-size:13px;
+      font-weight:700;
+    }
+    .hero-panel{
+      position:relative;
+      border:1px solid rgba(255,255,255,.16);
+      background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
+      border-radius:32px;
+      padding:18px;
+      box-shadow:0 34px 100px rgba(0,0,0,.38);
+    }
+    .hero-panel:before{
+      content:"";
+      position:absolute;inset:-1px;
+      border-radius:32px;
+      background:linear-gradient(135deg, rgba(45,212,191,.28), transparent 35%, rgba(30,136,229,.32));
+      z-index:-1;
+      filter:blur(10px);
+    }
+    .browser-bar{display:flex;align-items:center;gap:7px;padding:0 0 14px 2px}
+    .browser-bar span{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.35)}
+    .hero-shot{border-radius:22px;overflow:hidden;background:#0b1220;border:1px solid rgba(255,255,255,.10)}
+    .hero-shot img{width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top center}
+    .metric-stack{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-top:12px;
+    }
+    .metric{
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:13px;
+    }
+    .metric strong{display:block;font-size:18px;color:#fff;line-height:1.1}
+    .metric span{display:block;margin-top:4px;color:#b6c4d8;font-size:12px;font-weight:650}
+
+    /* Sections */
+    section{padding:88px 0}
+    .section-head{max-width:760px;margin:0 auto 42px;text-align:center}
+    .kicker{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;color:var(--brand2);font-weight:900;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+    .section-head h2{margin:0;font-size:clamp(31px,4vw,48px);line-height:1.05;letter-spacing:-1.5px}
+    .section-head p{margin:16px 0 0;color:var(--muted);font-size:18px}
+
+    .value-strip{padding:24px 0;background:#fff;border-bottom:1px solid #e2e8f0}
+    .value-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .value-card{
+      display:flex;align-items:center;gap:13px;
+      padding:18px;
+      border-radius:20px;
+      background:#f8fafc;
+      border:1px solid #e2e8f0;
+    }
+    .value-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#e0f2fe,#dcfce7);font-size:20px;flex:0 0 auto}
+    .value-card strong{display:block;font-size:15px}
+    .value-card span{display:block;color:var(--muted);font-size:13px;margin-top:1px}
+
+    /* Feature groups */
+    .features{background:#f4f7fb}
+    .feature-groups{display:grid;gap:22px}
+    .feature-group{
+      display:grid;
+      grid-template-columns:310px 1fr;
+      gap:22px;
+      align-items:stretch;
+    }
+    .group-title{
+      position:relative;
+      overflow:hidden;
+      min-height:250px;
+      padding:26px;
+      border-radius:var(--radius);
+      color:#fff;
+      background:linear-gradient(135deg,var(--brand2),var(--brand));
+      box-shadow:var(--shadow);
+    }
+    .group-title:nth-child(odd){background:linear-gradient(135deg,#0f172a,#1e88e5)}
+    .group-title .num{position:absolute;right:-12px;bottom:-34px;font-size:140px;font-weight:950;line-height:1;color:rgba(255,255,255,.13);letter-spacing:-10px}
+    .group-title h3{position:relative;margin:0;font-size:27px;line-height:1.1;letter-spacing:-.8px;max-width:230px}
+    .group-title p{position:relative;margin:14px 0 0;color:#dbeafe;font-size:15px;max-width:260px}
+    .feature-list{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+    }
+    .feature-item{
+      background:#fff;
+      border:1px solid #e2e8f0;
+      border-radius:20px;
+      padding:18px;
+      box-shadow:0 16px 38px rgba(15,23,42,.05);
+    }
+    .feature-item .mini-icon{
+      width:36px;height:36px;
+      display:grid;place-items:center;
+      border-radius:12px;
+      background:#eff6ff;
+      color:var(--brand2);
+      font-weight:900;
+      margin-bottom:12px;
+    }
+    .feature-item h4{margin:0;font-size:16px;letter-spacing:-.2px}
+    .feature-item p{margin:7px 0 0;color:var(--muted);font-size:14px}
+
+    /* Screens */
+    .screens{background:#0b1220;color:#fff;position:relative;overflow:hidden}
+    .screens:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 10%,rgba(30,136,229,.22),transparent 32%);pointer-events:none}
+    .screens .container{position:relative;z-index:1}
+    .screens .kicker{color:#7dd3fc}
+    .screens .section-head p{color:#b6c4d8}
+    .screen-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:22px;align-items:stretch}
+    .screen-card{
+      border-radius:26px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      overflow:hidden;
+      box-shadow:0 28px 80px rgba(0,0,0,.28);
+    }
+    .screen-card.large{grid-row:span 2}
+    .screen-card img{width:100%;height:100%;object-fit:cover;object-position:top center;transition:transform .35s ease}
+    .screen-card:hover img{transform:scale(1.025)}
+    .screen-caption{padding:18px 20px;border-top:1px solid rgba(255,255,255,.11);background:rgba(15,23,42,.78)}
+    .screen-caption strong{display:block;font-size:17px}
+    .screen-caption p{margin:5px 0 0;color:#b6c4d8;font-size:14px}
+
+    /* Comparison */
+    .compare{background:#fff}
+    .compare-wrap{
+      overflow:hidden;
+      border-radius:28px;
+      border:1px solid #e2e8f0;
+      box-shadow:var(--shadow);
+      background:#fff;
+    }
+    .compare-grid{display:grid;grid-template-columns:1fr 1fr 1fr;min-width:760px}
+    .compare-cell{padding:18px 20px;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0;font-size:15px}
+    .compare-cell:nth-child(3n){border-right:0}
+    .compare-head{font-weight:900;background:#f8fafc;color:#0f172a}
+    .compare-good{color:#14532d;font-weight:800;background:#f0fdf4}
+    .compare-bad{color:#7f1d1d;background:#fff7ed}
+    .compare-topic{font-weight:850;color:#0f172a;background:#f8fafc}
+    .compare-note{margin-top:16px;color:var(--muted);font-size:14px;text-align:center}
+    .table-scroll{overflow-x:auto}
+
+    /* Price */
+    .pricing{background:linear-gradient(180deg,#f4f7fb 0%,#eef4ff 100%)}
+    .price-layout{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center}
+    .price-copy{
+      background:#fff;
+      border:1px solid #e2e8f0;
+      border-radius:28px;
+      padding:34px;
+      box-shadow:0 18px 60px rgba(15,23,42,.07);
+    }
+    .price-copy h2{margin:0;font-size:clamp(32px,4vw,52px);line-height:1.02;letter-spacing:-1.5px}
+    .price-copy p{color:var(--muted);font-size:17px;margin:16px 0 0}
+    .price-highlights{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:24px}
+    .check-item{display:flex;gap:10px;align-items:flex-start;color:#334155;font-weight:650;font-size:15px}
+    .check{width:22px;height:22px;border-radius:50%;background:#dcfce7;color:#166534;display:grid;place-items:center;font-size:13px;font-weight:900;flex:0 0 auto;margin-top:1px}
+    .price-card{
+      position:relative;
+      overflow:hidden;
+      border-radius:32px;
+      padding:30px;
+      color:#fff;
+      background:linear-gradient(135deg,#0b1220,#0d47a1 58%,#1e88e5);
+      box-shadow:0 30px 90px rgba(13,71,161,.28);
+    }
+    .price-card:before{content:"";position:absolute;right:-55px;top:-55px;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.13)}
+    .badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.17);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#e0f2fe}
+    .price-card h3{margin:22px 0 0;font-size:24px}
+    .price{display:flex;align-items:flex-end;gap:8px;margin:8px 0 18px}
+    .price strong{font-size:54px;line-height:1;letter-spacing:-2px}
+    .price span{color:#cbd5e1;margin-bottom:8px;font-weight:700}
+    .price-card ul{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:11px;color:#e2e8f0;font-size:15px}
+    .price-card li{display:flex;gap:9px;align-items:flex-start}
+    .price-card li:before{content:"✓";color:#86efac;font-weight:900}
+    .upgrade-note{margin-top:18px;padding:14px;border-radius:16px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.12);color:#dbeafe;font-size:13px}
+
+    /* Contact */
+    .contact{background:#0b1220;color:#fff}
+    .contact-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:28px;align-items:start}
+    .contact-card,
+    .contact-form{
+      border-radius:28px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 24px 70px rgba(0,0,0,.22);
+    }
+    .contact-card{padding:32px}
+    .contact-card h2{margin:0;font-size:38px;line-height:1.05;letter-spacing:-1.2px}
+    .contact-card p{color:#b6c4d8;font-size:17px;margin:14px 0 24px}
+    .contact-list{display:grid;gap:13px;margin-top:24px}
+    .contact-line{display:flex;gap:12px;padding:15px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10)}
+    .contact-line span:first-child{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:rgba(30,136,229,.22);flex:0 0 auto}
+    .contact-line strong{display:block;font-size:14px;color:#fff}
+    .contact-line a,.contact-line small{display:block;color:#cbd5e1;margin-top:1px}
+    .contact-form{padding:26px}
+    .field{display:grid;gap:7px;margin-bottom:14px}
+    .field label{color:#e2e8f0;font-weight:800;font-size:14px}
+    .field input,.field textarea{
+      width:100%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:#fff;border-radius:16px;padding:14px 15px;outline:0;transition:border-color .2s ease, box-shadow .2s ease;
+    }
+    .field textarea{min-height:124px;resize:vertical}
+    .field input:focus,.field textarea:focus{border-color:#60a5fa;box-shadow:0 0 0 4px rgba(96,165,250,.15)}
+    .field input::placeholder,.field textarea::placeholder{color:#94a3b8}
+    .form-note{color:#9fb0c8;font-size:13px;margin:12px 0 0}
+
+    .final-cta{padding:56px 0;background:linear-gradient(135deg,#0d47a1,#1e88e5);color:#fff;text-align:center}
+    .final-cta h2{margin:0;font-size:clamp(30px,4vw,48px);letter-spacing:-1.4px;line-height:1.05}
+    .final-cta p{margin:13px auto 0;max-width:680px;color:#dbeafe;font-size:17px}
+    .final-cta .hero-actions{justify-content:center;margin-top:24px}
+
+    footer{background:#07101d;color:#93a4bc;padding:28px 0;border-top:1px solid rgba(255,255,255,.08)}
+    .footer-inner{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;font-size:14px}
+    .footer-brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:850}
+    .footer-brand img{width:34px;height:34px;object-fit:contain;border-radius:10px}
+
+    .floating-wa{
+      position:fixed;right:18px;bottom:18px;z-index:90;
+      width:58px;height:58px;border-radius:50%;display:grid;place-items:center;
+      background:#22c55e;color:#052e16;font-weight:950;font-size:26px;
+      box-shadow:0 18px 42px rgba(34,197,94,.38);
+      border:3px solid rgba(255,255,255,.9);
+    }
+
+    @media (max-width:1040px){
+      .hero-grid{grid-template-columns:1fr;gap:34px}
+      .hero-panel{max-width:760px;margin-inline:auto}
+      .feature-group{grid-template-columns:1fr}
+      .group-title{min-height:auto}
+      .feature-list{grid-template-columns:repeat(2,1fr)}
+      .price-layout{grid-template-columns:1fr}
+      .price-card{max-width:620px;margin-inline:auto;width:100%}
+      .contact-grid{grid-template-columns:1fr}
+    }
+    @media (max-width:860px){
+      .nav-links{
+        position:fixed;left:20px;right:20px;top:82px;display:none;flex-direction:column;align-items:stretch;padding:14px;background:#0b1220;border:1px solid rgba(255,255,255,.14);border-radius:22px;box-shadow:0 20px 50px rgba(0,0,0,.32)
+      }
+      .nav-links.is-open{display:flex}
+      .nav-links a{padding:13px 14px}
+      .nav-cta .btn{display:none}
+      .menu-btn{display:inline-flex}
+      .value-grid{grid-template-columns:repeat(2,1fr)}
+      .screen-grid{grid-template-columns:1fr}
+      .screen-card.large{grid-row:auto}
+      .price-highlights{grid-template-columns:1fr}
+    }
+    @media (max-width:640px){
+      .container{width:min(100% - 28px, var(--container))}
+      section{padding:68px 0}
+      .hero{padding:56px 0 54px}
+      .hero-actions{flex-direction:column;align-items:stretch}
+      .btn{width:100%}
+      .trust-row{gap:8px}
+      .trust-pill{width:100%;justify-content:center}
+      .metric-stack{grid-template-columns:1fr}
+      .value-grid{grid-template-columns:1fr}
+      .feature-list{grid-template-columns:1fr}
+      .group-title{padding:22px}
+      .screen-caption{padding:15px}
+      .price-copy,.contact-card,.contact-form{padding:22px}
+      .price strong{font-size:48px}
+      .footer-inner{align-items:flex-start;flex-direction:column}
+      .floating-wa{right:14px;bottom:14px;width:54px;height:54px}
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#icerik">İçeriğe geç</a>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="#top" aria-label="MobiStok ana sayfa">
+        <img src="logo.png" alt="MobiStok logo" />
+        <span class="brand-text">
+          <strong>MobiStok</strong>
+          <span>Telefoncu Yönetim Yazılımı</span>
+        </span>
+      </a>
+      <nav class="nav-links" id="navLinks" aria-label="Ana menü">
+        <a href="#ozellikler">Özellikler</a>
+        <a href="#ekranlar">Ekranlar</a>
+        <a href="#lokal">Neden Lokal?</a>
+        <a href="#fiyat">Fiyat</a>
+        <a href="#iletisim">İletişim</a>
+      </nav>
+      <div class="nav-cta">
+        <a class="btn btn-primary" href="https://wa.me/905435217476?text=Merhaba%2C%20MobiStok%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener">Demo İste</a>
+        <button class="menu-btn" type="button" aria-label="Menüyü aç" aria-controls="navLinks" aria-expanded="false">☰ Menü</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="icerik">
+    <section class="hero" id="top">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> Aboneliksiz · İnternetsiz · Lokal</div>
+          <h1 class="hero-title">Telefon Dükkânınız İçin <span>Eksiksiz Dijital Yönetim</span></h1>
+          <p class="hero-lead">Alış, satış, stok, sayım, cari hesap, kasa raporu ve kâr takibi — hepsi tek programda. Kurulum derdi olmadan, veriler kendi bilgisayarınızda.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#fiyat">Hemen Satın Al</a>
+            <a class="btn btn-soft" href="https://wa.me/905435217476?text=Merhaba%2C%20MobiStok%20i%C3%A7in%20%C3%BCcretsiz%20demo%20istiyorum." target="_blank" rel="noopener">Ücretsiz Demo İste</a>
+          </div>
+          <div class="trust-row" aria-label="Öne çıkan avantajlar">
+            <span class="trust-pill">✓ İnternetsiz çalışır</span>
+            <span class="trust-pill">✓ Veriler bilgisayarınızda</span>
+            <span class="trust-pill">⚡ Çift tıkla başlat</span>
+            <span class="trust-pill">✓ Aylık abonelik yok</span>
+          </div>
+        </div>
+
+        <div class="hero-panel" aria-label="MobiStok panel ekranı">
+          <div class="browser-bar"><span></span><span></span><span></span></div>
+          <div class="hero-shot">
+            <img src="ekran/panel.png" alt="MobiStok panel ve grafikler ekran görüntüsü" loading="eager" />
+          </div>
+          <div class="metric-stack">
+            <div class="metric"><strong>30+</strong><span>Özellik</span></div>
+            <div class="metric"><strong>Tek</strong><span>Paket</span></div>
+            <div class="metric"><strong>0 ₺</strong><span>Aylık ücret</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="value-strip" aria-label="MobiStok değer önerileri">
+      <div class="container value-grid">
+        <div class="value-card"><div class="value-icon">📦</div><div><strong>Stok kontrolü</strong><span>IMEI, garanti, sayım, değer</span></div></div>
+        <div class="value-card"><div class="value-icon">₺</div><div><strong>Kâr takibi</strong><span>Anlık kâr ve marj bilgisi</span></div></div>
+        <div class="value-card"><div class="value-icon">👥</div><div><strong>Cari & kasa</strong><span>Alacak, borç, tahsilat, ödeme</span></div></div>
+        <div class="value-card"><div class="value-icon">🛡️</div><div><strong>Veri kontrolü</strong><span>SQLite tek dosya, lokal kullanım</span></div></div>
+      </div>
+    </div>
+
+    <section class="features" id="ozellikler">
+      <div class="container">
+        <div class="section-head">
+          <span class="kicker">30+ Özellik</span>
+          <h2>Telefoncunun günlük işini tek ekranda toparlayan sistem</h2>
+          <p>Pratikten profesyonele, küçük dükkândan büyüyen işletmeye — her modül sahadaki gerçek ihtiyaca göre konumlandı.</p>
+        </div>
+
+        <div class="feature-groups">
+          <article class="feature-group">
+            <div class="group-title"><span class="num">01</span><h3>Hızlı Alış & Satış Kaydı</h3><p>Butonlu, akıllı formlar ile saniyeler içinde kayıt oluşturun.</p></div>
+            <div class="feature-list">
+              <div class="feature-item"><div class="mini-icon">1</div><h4>3-Sütun Kompakt Form</h4><p>Satıcı, telefon ve ödeme bilgisi tek ekranda; kaydırmadan hızlı giriş.</p></div>
+              <div class="feature-item"><div class="mini-icon">₺</div><h4>Otomatik Kâr Hesabı</h4><p>Satış fiyatı girilince kâr anlık görünür; eksi kârda kırmızı uyarı verir.</p></div>
+              <div class="feature-item"><div class="mini-icon">🏷</div><h4>Liste Satış Fiyatı</h4><p>Patron satış fiyatını belirler, eleman pazarlığa göre değiştirebilir.</p></div>
+              <div class="feature-item"><div class="mini-icon">💳</div><h4>Çoklu Kısmi Ödeme</h4><p>Nakit, kart ve banka aynı satışta kullanılabilir; kalan bakiye otomatik hesaplanır.</p></div>
+              <div class="feature-item"><div class="mini-icon">⏩</div><h4>Kaydet ve Yeni</h4><p>Ardışık alış girişi için tek tıkla yeni kayıt açılır.</p></div>
+              <div class="feature-item"><div class="mini-icon">▣</div><h4>IMEI Kamera ile Okut</h4><p>Telefon barkodunu okutarak IMEI alanı otomatik doldurulur.</p></div>
+            </div>
+          </article>
+
+          <article class="feature-group">
+            <div class="group-title"><span class="num">02</span><h3>Stok Yönetimi</h3><p>Stoktaki tüm telefonları, değerleri ve durumları tek bakışta görün.</p></div>
+            <div class="feature-list">
+              <div class="feature-item"><div class="mini-icon">📋</div><h4>Anlık Stok Listesi</h4><p>Stoktaki telefonlar, toplam maliyet ve satış değeri anında görünür.</p></div>
+              <div class="feature-item"><div class="mini-icon">✓</div><h4>Stok Sayımı</h4><p>IMEI işaretleyerek sayım yapın; eksik telefon ve maliyet farkı raporu alın.</p></div>
+              <div class="feature-item"><div class="mini-icon">🔒</div><h4>IMEI Güvencesi</h4><p>Her IMEI benzersizdir. Aynı telefonun iki kez girilmesi engellenir.</p></div>
+              <div class="feature-item"><div class="mini-icon">🛠</div><h4>Garanti Takibi</h4><p>Kalan gün renkli badge ile görünür: 30+ yeşil, 7 altı kırmızı.</p></div>
+              <div class="feature-item"><div class="mini-icon">🎨</div><h4>Renk Paleti</h4><p>Tanımlanan renkler telefon listesinde gerçek renkleriyle gösterilir.</p></div>
+              <div class="feature-item"><div class="mini-icon">⏳</div><h4>Yavaş Hareket Eden Stok</h4><p>60+ gündür stokta bekleyen telefonları görün, indirim kararı alın.</p></div>
+            </div>
+          </article>
+
+          <article class="feature-group">
+            <div class="group-title"><span class="num">03</span><h3>Cari Hesap & Kasa</h3><p>Kimden alacağınız, kime borcunuz var; kasa hareketiyle beraber netleşir.</p></div>
+            <div class="feature-list">
+              <div class="feature-item"><div class="mini-icon">👥</div><h4>Cari Hesap Sayfası</h4><p>Müşteri alacakları ve tedarikçi borçları tek sayfada aranabilir.</p></div>
+              <div class="feature-item"><div class="mini-icon">⚡</div><h4>Hızlı Tahsilat / Ödeme</h4><p>Cari listesinden tek tıkla tahsilat veya ödeme girin; kasa otomatik güncellenir.</p></div>
+              <div class="feature-item"><div class="mini-icon">📅</div><h4>Kasa Raporu</h4><p>Günlük para giriş-çıkışını yöntem ve kişi bazında detaylı izleyin.</p></div>
+              <div class="feature-item"><div class="mini-icon">A4</div><h4>A4 Yazdırma</h4><p>Kasa raporunu tek A4'e yazdırın; gün sonu kapanış belgesi oluşturun.</p></div>
+              <div class="feature-item"><div class="mini-icon">!</div><h4>Geç Giriş Uyarısı</h4><p>Geçmiş tarihe kayıt girildiğinde kasa raporu uyarır.</p></div>
+              <div class="feature-item"><div class="mini-icon">∑</div><h4>Net Hareket Tablosu</h4><p>Yöntem başına tahsilat, ödeme ve net hareket ayrı ayrı görünür.</p></div>
+            </div>
+          </article>
+
+          <article class="feature-group">
+            <div class="group-title"><span class="num">04</span><h3>Raporlar & Analiz</h3><p>Ne sattınız, ne kazandınız, hangi ürün daha iyi gidiyor; sayılarla izleyin.</p></div>
+            <div class="feature-list">
+              <div class="feature-item"><div class="mini-icon">▦</div><h4>Sekmeli Raporlar</h4><p>Özet, satışlar ve alışlar ayrı sekmelerde odaklı şekilde sunulur.</p></div>
+              <div class="feature-item"><div class="mini-icon">🏆</div><h4>Top Satan Modeller</h4><p>Adet, ciro ve kâr bazında en çok satan 5 model toggle ile incelenir.</p></div>
+              <div class="feature-item"><div class="mini-icon">%</div><h4>Ortalama Kâr Marjı</h4><p>Dönem boyunca ortalama kâr yüzdesi performans göstergesi olarak sunulur.</p></div>
+              <div class="feature-item"><div class="mini-icon">📆</div><h4>Esnek Tarih Filtresi</h4><p>Bugün, bu hafta, bu ay, bu yıl veya özel tarih aralığı seçilebilir.</p></div>
+              <div class="feature-item"><div class="mini-icon">🏷</div><h4>Marka / Kategori Bazlı</h4><p>Hangi marka ve kategori daha kârlı, özel tablolarla görünür.</p></div>
+              <div class="feature-item"><div class="mini-icon">📊</div><h4>Panel Grafikleri</h4><p>Yıllık kategori bazlı satış, kâr ve ödeme yöntemi dağılımı izlenir.</p></div>
+            </div>
+          </article>
+
+          <article class="feature-group">
+            <div class="group-title"><span class="num">05</span><h3>Veri Güvenliği & Yedekleme</h3><p>Verileriniz sizin kontrolünüzde kalır, yedekleme işi kolaylaşır.</p></div>
+            <div class="feature-list">
+              <div class="feature-item"><div class="mini-icon">💾</div><h4>Veriler Sizde</h4><p>SQLite tek dosya; bilgiler bilgisayarınızdan dışarı çıkmaz, bulutta değildir.</p></div>
+              <div class="feature-item"><div class="mini-icon">↻</div><h4>Otomatik Yedek</h4><p>Haftada bir otomatik yedek alınır, son 7 yedek saklanır.</p></div>
+              <div class="feature-item"><div class="mini-icon">⬇</div><h4>Manuel Yedek İndir</h4><p>Yedek dosyasını tek tıkla indirip USB'ye kopyalayabilirsiniz.</p></div>
+              <div class="feature-item"><div class="mini-icon">⬆</div><h4>Yedek Yükle</h4><p>Eski bir yedeği ayarlardan tek tıkla geri yükleyin.</p></div>
+              <div class="feature-item"><div class="mini-icon">🕘</div><h4>Faaliyet Kayıtları</h4><p>Tüm ekleme, güncelleme ve silme işlemleri 90 gün kayıt altında tutulur.</p></div>
+              <div class="feature-item"><div class="mini-icon">🔐</div><h4>Güvenli Lisans</h4><p>Makineye özel şifreli lisans sistemiyle kullanım güvence altına alınır.</p></div>
+            </div>
+          </article>
+
+          <article class="feature-group">
+            <div class="group-title"><span class="num">06</span><h3>Sistem & Kullanım Kolaylığı</h3><p>Kurulum, eğitim ve karmaşık hesaplarla uğraşmadan kullanmaya başlayın.</p></div>
+            <div class="feature-list">
+              <div class="feature-item"><div class="mini-icon">🔔</div><h4>Otomatik Güncelleme Bildirimi</h4><p>Yeni sürüm çıktığında program bilgi verir, geliştirmelerden haberdar olursunuz.</p></div>
+              <div class="feature-item"><div class="mini-icon">XLS</div><h4>Excel Toplu İçe Aktarma</h4><p>Eski stoğunuzu Excel'den hataya dayanıklı şekilde toplu yükleyin.</p></div>
+              <div class="feature-item"><div class="mini-icon">🔎</div><h4>Global Telefon Arama</h4><p>IMEI veya marka ile herhangi bir sayfadan stokta hızlı arama yapın.</p></div>
+              <div class="feature-item"><div class="mini-icon">PDF</div><h4>Excel / PDF Dışa Aktarma</h4><p>Stok, alış ve satış listelerini Excel veya PDF formatında indirin.</p></div>
+              <div class="feature-item"><div class="mini-icon">₺</div><h4>Türkçe Para Formatı</h4><p>1.234,56 ₺ formatı ile virgül-nokta karışıklığı yaşanmaz.</p></div>
+              <div class="feature-item"><div class="mini-icon">🏪</div><h4>Dükkân Adı Özelleştirme</h4><p>Programı kendi dükkân adınızla görüntüleyin, profesyonel görünüm kazanın.</p></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="screens" id="ekranlar">
+      <div class="container">
+        <div class="section-head">
+          <span class="kicker">Ekran Görüntüleri</span>
+          <h2>Sade, hızlı, anlaşılır arayüz</h2>
+          <p>Bilgisayar bilmeyen personel bile kısa sürede alışır; patron için sayıların tamamı görünür olur.</p>
+        </div>
+        <div class="screen-grid">
+          <article class="screen-card large">
+            <img src="ekran/panel.png" alt="MobiStok panel ve grafikler" loading="lazy" />
+            <div class="screen-caption"><strong>Panel & Grafikler</strong><p>Anlık KPI'lar, günlük/aylık kâr, yıllık kategori grafikleri.</p></div>
+          </article>
+          <article class="screen-card">
+            <img src="ekran/alis.png" alt="MobiStok alış ve stok listesi" loading="lazy" />
+            <div class="screen-caption"><strong>Alışlar & Stok</strong><p>Filtreli liste, tek tıkla “Sat”, durum ve kalan takibi.</p></div>
+          </article>
+          <article class="screen-card">
+            <img src="ekran/rapor.png" alt="MobiStok raporlar ekranı" loading="lazy" />
+            <div class="screen-caption"><strong>Detaylı Raporlar</strong><p>Top satan modeller, kâr marjı, yavaş stok ve dönem analizi.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="compare" id="lokal">
+      <div class="container">
+        <div class="section-head">
+          <span class="kicker">Karşılaştırma</span>
+          <h2>Neden lokal çözüm?</h2>
+          <p>Online aboneliklerin aksine MobiStok bilgisayarınızda çalışır. Kontrol sizde kalır.</p>
+        </div>
+        <div class="compare-wrap table-scroll" role="region" aria-label="MobiStok ve online program karşılaştırması" tabindex="0">
+          <div class="compare-grid">
+            <div class="compare-cell compare-head">Konu</div>
+            <div class="compare-cell compare-head">MobiStok (Lokal)</div>
+            <div class="compare-cell compare-head">Online Programlar</div>
+
+            <div class="compare-cell compare-topic">Veri Güvenliği</div>
+            <div class="compare-cell compare-good">Veriler sizin bilgisayarınızda</div>
+            <div class="compare-cell compare-bad">Başkasının sunucusunda</div>
+
+            <div class="compare-cell compare-topic">Müşteri Bilgisi</div>
+            <div class="compare-cell compare-good">Dışarı çıkmaz</div>
+            <div class="compare-cell compare-bad">İnternete gönderilir</div>
+
+            <div class="compare-cell compare-topic">İnternet</div>
+            <div class="compare-cell compare-good">Gerekmez, kesintide çalışır</div>
+            <div class="compare-cell compare-bad">İnternet yoksa çalışmaz</div>
+
+            <div class="compare-cell compare-topic">Maliyet</div>
+            <div class="compare-cell compare-good">Tek seferlik ödeme</div>
+            <div class="compare-cell compare-bad">Aylık / yıllık abonelik</div>
+
+            <div class="compare-cell compare-topic">Hız</div>
+            <div class="compare-cell compare-good">Anında, gecikmesiz</div>
+            <div class="compare-cell compare-bad">Bağlantıya bağlı</div>
+
+            <div class="compare-cell compare-topic">Yedekleme</div>
+            <div class="compare-cell compare-good">Tek dosyayı kopyala</div>
+            <div class="compare-cell compare-bad">Firmaya bağımlı</div>
+
+            <div class="compare-cell compare-topic">Kurulum</div>
+            <div class="compare-cell compare-good">Çift tıkla başlat</div>
+            <div class="compare-cell compare-bad">Hesap / üyelik gerekir</div>
+
+            <div class="compare-cell compare-topic">Güncelleme</div>
+            <div class="compare-cell compare-good">Bilgi gelir, istersen yükle</div>
+            <div class="compare-cell compare-bad">Zorunlu, kontrol sende değil</div>
+          </div>
+        </div>
+        <p class="compare-note">Amaç karmaşık kurumsal ERP değil; telefon dükkânının günlük işini hızlı, güvenli ve maliyetsiz takip etmektir.</p>
+      </div>
+    </section>
+
+    <section class="pricing" id="fiyat">
+      <div class="container price-layout">
+        <div class="price-copy">
+          <span class="kicker">Fiyat</span>
+          <h2>Adil ve şeffaf: tek ödeme, ömür boyu kullanım</h2>
+          <p>Aylık abonelik, gizli ücret ve zorunlu online üyelik yok. Programı satın alın, kendi bilgisayarınızda kullanın.</p>
+          <div class="price-highlights">
+            <div class="check-item"><span class="check">✓</span><span>Tüm özellikler: alış, satış, stok, sayım, cari, kasa, raporlar</span></div>
+            <div class="check-item"><span class="check">✓</span><span>30+ özellik ve sınırsız kayıt</span></div>
+            <div class="check-item"><span class="check">✓</span><span>Tek bilgisayarda kullanım</span></div>
+            <div class="check-item"><span class="check">✓</span><span>WhatsApp destek</span></div>
+            <div class="check-item"><span class="check">✓</span><span>İnternetsiz çalışır</span></div>
+            <div class="check-item"><span class="check">✓</span><span>Çift tıkla başlat — kurulum yok</span></div>
+          </div>
+        </div>
+        <aside class="price-card" aria-label="MobiStok lisans fiyatı">
+          <span class="badge">Tek Paket</span>
+          <h3>MobiStok Lisansı</h3>
+          <div class="price"><strong>2.990 ₺</strong><span>tek seferlik</span></div>
+          <a class="btn btn-light" href="https://wa.me/905435217476?text=Merhaba%2C%20MobiStok%20lisans%C4%B1%20sat%C4%B1n%20almak%20veya%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener">Satın Al / Bilgi Al</a>
+          <ul>
+            <li>Ömür boyu lisans</li>
+            <li>Tüm ücretsiz güncellemeler dahil</li>
+            <li>Bilgisayar değişiminde lisans yenileme ücretsiz</li>
+            <li>Hata düzeltmeleri ve küçük iyileştirmeler ücretsiz dağıtılır</li>
+          </ul>
+          <p class="upgrade-note">Büyük yeni sürümler çıkarsa mevcut müşterilere indirimli upgrade fırsatı sunulur. Eski sürümde kalmak isteyene zorunluluk yoktur.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="contact" id="iletisim">
+      <div class="container contact-grid">
+        <div class="contact-card">
+          <span class="kicker">İletişim</span>
+          <h2>Bilgi, demo veya satın alma için yazın</h2>
+          <p>Telefon dükkânınızın mevcut işleyişini anlatın; MobiStok'un size nerede hız kazandıracağını birlikte netleştirelim.</p>
+          <a class="btn btn-whatsapp" href="https://wa.me/905435217476?text=Merhaba%2C%20MobiStok%20hakk%C4%B1nda%20g%C3%B6r%C3%BC%C5%9Fmek%20istiyorum." target="_blank" rel="noopener">WhatsApp'tan Yazın</a>
+          <div class="contact-list">
+            <div class="contact-line"><span>☎</span><div><strong>WhatsApp / Telefon</strong><a href="https://wa.me/905435217476" target="_blank" rel="noopener">0543 521 74 76</a></div></div>
+            <div class="contact-line"><span>@</span><div><strong>E-posta</strong><a href="mailto:mehmetbtk@gmail.com">mehmetbtk@gmail.com</a></div></div>
+            <div class="contact-line"><span>👨‍💻</span><div><strong>Geliştirici</strong><small>Mehmet Batuk</small></div></div>
+          </div>
+        </div>
+
+        <form class="contact-form" id="whatsappForm">
+          <div class="field">
+            <label for="name">Adınız</label>
+            <input id="name" name="name" autocomplete="name" placeholder="Adınız ve işletme adınız" />
+          </div>
+          <div class="field">
+            <label for="phone">Telefon</label>
+            <input id="phone" name="phone" autocomplete="tel" placeholder="05xx xxx xx xx" />
+          </div>
+          <div class="field">
+            <label for="message">Mesajınız</label>
+            <textarea id="message" name="message" placeholder="Merhaba, MobiStok için demo almak istiyorum."></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">WhatsApp ile Gönder</button>
+          <p class="form-note">Form gönderimi WhatsApp mesajı oluşturur; sitenizde ekstra backend gerekmez.</p>
+        </form>
+      </div>
+    </section>
+
+    <section class="final-cta" aria-label="Son çağrı">
+      <div class="container">
+        <h2>Dükkânınızı dijitalleştirin</h2>
+        <p>Aboneliksiz, internetsiz, kontrolünüz altında. Programı deneyin, stok ve kâr takibini tek yerden yönetin.</p>
+        <div class="hero-actions">
+          <a class="btn btn-light" href="https://wa.me/905435217476?text=Merhaba%2C%20MobiStok%20i%C3%A7in%20%C3%BCcretsiz%20demo%20istiyorum." target="_blank" rel="noopener">Ücretsiz Demo İste</a>
+          <a class="btn btn-soft" href="#ozellikler">Özellikleri İncele</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-brand"><img src="logo.png" alt="MobiStok logo" /> MobiStok</div>
+      <div>Cep Telefonu Alış/Satış & Kâr Takip Programı</div>
+      <div>Geliştirici: Mehmet Batuk · <a href="https://wa.me/905435217476" target="_blank" rel="noopener">WhatsApp: 0543 521 74 76</a> · <a href="mailto:mehmetbtk@gmail.com">mehmetbtk@gmail.com</a></div>
+      <div>© 2026 MobiStok. Tüm hakları saklıdır.</div>
+    </div>
+  </footer>
+
+  <a class="floating-wa" href="https://wa.me/905435217476?text=Merhaba%2C%20MobiStok%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener" aria-label="WhatsApp ile iletişime geç">☎</a>
+
+  <script>
+    const menuBtn = document.querySelector('.menu-btn');
+    const navLinks = document.getElementById('navLinks');
+    if (menuBtn && navLinks) {
+      menuBtn.addEventListener('click', () => {
+        const open = navLinks.classList.toggle('is-open');
+        menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('is-open');
+          menuBtn.setAttribute('aria-expanded', 'false');
+        });
+      });
+    }
+
+    const form = document.getElementById('whatsappForm');
+    if (form) {
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const message = document.getElementById('message').value.trim() || 'Merhaba, MobiStok için demo almak istiyorum.';
+        const lines = [
+          'Merhaba, MobiStok hakkında bilgi almak istiyorum.',
+          name ? 'Adım: ' + name : '',
+          phone ? 'Telefon: ' + phone : '',
+          'Mesaj: ' + message
+        ].filter(Boolean);
+        const url = 'https://wa.me/905435217476?text=' + encodeURIComponent(lines.join('\n'));
+        window.open(url, '_blank', 'noopener');
+      });
+    }
+  </script>
+</body>
+</html>
